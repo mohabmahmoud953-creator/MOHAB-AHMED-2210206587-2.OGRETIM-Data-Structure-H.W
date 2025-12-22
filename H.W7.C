@@ -1,84 +1,62 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-// Insertion Algorithm
-// 1. Start
-// 2. Set J = N
-// 3. Set N = N + 1
-// 4. Repeat steps 5 and 6 while J >= K
-// 5. Set LA[J+1] = LA[J]
-// 6. Set J = J - 1
-// 7. Set LA[K] = ITEM
-// 8. Stop
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
 
-int insert(int LA[], int N, int K, int ITEM) {
-    int J = N;
-    N = N + 1;
-    
-    while (J >= K) {
-        LA[J + 1] = LA[J];
-        J = J - 1;
-    }
-    
-    LA[K] = ITEM;
-    return N;
+Node* createNode(int value) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = value;
+    newNode->next = NULL;
+    return newNode;
 }
 
-// Deletion Algorithm
-// 1. Start
-// 2. Set deletedItem = LA[K]
-// 3. Repeat for i = K to N-2
-// 4. Set LA[i] = LA[i+1]
-// 5. Set N = N - 1
-// 6. Stop
-
-int delete(int LA[], int N, int K) {
-    int deletedItem = LA[K];
-    
-    for (int i = K; i < N - 1; i++) {
-        LA[i] = LA[i + 1];
+void insertAtEnd(Node** head, int value) {
+    Node* newNode = createNode(value);
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->next = *head;
+        return;
     }
-    
-    printf("Deleted %d from position %d\n", deletedItem, K);
-    return N - 1;
+    Node* temp = *head;
+    while (temp->next != *head) temp = temp->next;
+    temp->next = newNode;
+    newNode->next = *head;
 }
 
-// Search Algorithm
-// 1. Start
-// 2. Repeat for i = 0 to N-1
-// 3. If LA[i] == ITEM then return i
-// 4. If not found return -1
-// 5. Stop
-
-int search(int LA[], int N, int ITEM) {
-    for (int i = 0; i < N; i++) {
-        if (LA[i] == ITEM) {
-            return i;
+void deleteAtPosition(Node** head, int pos) {
+    if (*head == NULL) return;
+    Node *temp = *head, *prev = NULL;
+    if (pos == 0) {
+        Node* last = *head;
+        while (last->next != *head) last = last->next;
+        if (*head == last) {
+            free(*head);
+            *head = NULL;
+        } else {
+            last->next = (*head)->next;
+            *head = (*head)->next;
+            free(temp);
         }
+        return;
     }
-    return -1;
+    for (int i = 0; i < pos; i++) {
+        prev = temp;
+        temp = temp->next;
+        if (temp == *head) return;
+    }
+    prev->next = temp->next;
+    free(temp);
 }
 
-int main() {
-    int LA[100] = {10, 20, 30, 40, 50};
-    int N = 5;
-    
-    printf("Original Array: ");
-    for(int i=0; i<N; i++) printf("%d ", LA[i]);
-    printf("\n");
-    
-    N = insert(LA, N, 2, 99);
-    printf("After insertion: ");
-    for(int i=0; i<N; i++) printf("%d ", LA[i]);
-    printf("\n");
-    
-    int pos = search(LA, N, 99);
-    if(pos != -1) 
-        printf("Item 99 found at position %d\n", pos);
-    
-    N = delete(LA, N, 2);
-    printf("After deletion: ");
-    for(int i=0; i<N; i++) printf("%d ", LA[i]);
-    
-    return 0;
-
+void printList(Node* head) {
+    if (head == NULL) return;
+    Node* temp = head;
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(Head)\n");
 }
